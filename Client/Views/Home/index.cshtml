@@ -1,0 +1,108 @@
+﻿
+@{
+   
+}
+@*<link href="~/Content/popup.css" rel="stylesheet" />*@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Quan ly sinh vien</title>
+</head>
+<body>
+    <div class="row"> 
+        <div class="col-lg-6" >
+            <table id="StudentTable" class="table table-bordered table-condensed table-condensed" >
+                <thead>
+                    <tr>
+                        <th>Edit</th>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Class Id</th>
+                        <th>Delete</th>
+                    </tr>
+
+                </thead>
+
+                <tbody></tbody>
+            </table>
+          
+        </div>
+    </div>
+
+    <hr/>
+
+    <div class="form-group">
+        <label for="StudentId">Student Id</label>
+        <input type="text" id="StudentId" class="form-control" />
+        <label for="StudentName">Name Student</label>
+        <input type="text" id="StudentName" class="form-control" />
+        <label for="LopId">Lop Id</label>
+        <input type="text" id="LopId" class="form-control" />
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <button type="button" id="addStudent" class="btn btn-primary" 
+                    onclick="addStudent()" > Add Student</button>
+
+            </div>
+        </div>
+
+    @section Scripts{
+        <script>
+            $(document).ready(function () {
+                getStudent();
+
+            });
+
+            function getStudent() {
+                $.ajax({
+                    url: 'http://localhost:56073/api/Students',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (students) {
+                        alert("thanh cong");
+                        $.each(students, function (index, student) {
+                            addRowStudent(student);
+                       
+                        });
+                    },
+                    error: function (request, message, error) {
+                        alert(error);
+                    }
+                });
+            };
+
+            function addRowStudent(student) {
+                $("#StudentTable tbody").append(
+                    "<tr>"+
+                    "<td><button type='button' onclick='getStudent(this);' " +
+                    "class ='btn btn-default' data-id='" + student.Id + "'>" +
+                    "<span class='glyphicon glyphicon-edit'/> </button>" +
+                    "</td>" +
+                    "<td>" + student.Id + "</td>" +
+                     "<td>" + student.Name + "</td>" +
+                     "<td>" + student.LopId + "</td>" +
+                     "<td><button type='button' onclick='deleteStudent(this);' class ='btn btn-default' " +
+                     "data-id ='" + student.Id + "'> " +
+                     "<span class='glyphicon glyphicon-remove' />  </button>" +
+                     "</td>" +
+                     "</tr>"
+
+                  );
+            };
+
+            function getStudent(row) {
+
+            };
+
+            function deleteStudent(row) {
+
+            };
+
+        </script>
+        }
+</body>
+</html>

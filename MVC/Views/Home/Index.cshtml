@@ -1,0 +1,242 @@
+﻿@{
+
+}
+@*<link href="~/Content/popup.css" rel="stylesheet" />*@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Quan ly sinh vien</title>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+    <script type="text/javascript">
+
+       
+
+            $(document).ready(function () {
+                getStudent();
+
+            });
+
+            function getStudent() {
+               
+                $("#StudentTable tbody").remove();
+
+                $.ajax({
+                    url: '/api/Students',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (students) {
+                       
+                        $.each(students, function (index, student) {
+                            addRowStudent(student);
+
+                        });
+                    },
+                    error: function (request, message, error) {
+                        handleException(request,message,error);
+                    }
+                });
+            };
+
+            function addRowStudent(student) {
+
+                if ($("#StudentTable tbody").length == 0) {
+                    $("#StudentTable").append("<tbody></tbody>");
+                }
+
+                $("#StudentTable tbody").append(
+                    "<tr>"+
+                    "<td><button type='button' onclick='fillStudent(this);' " +
+                    "class ='btn btn-default' data-id='" + student.Id + "'>" +
+                    "<span class='glyphicon glyphicon-edit'/> </button>" +
+                    "</td>" +
+                    "<td>" + student.Id + "</td>" +
+                     "<td>" + student.Name + "</td>" +
+                     "<td>" + student.LopId + "</td>" +
+                     "<td><button type='button' onclick='deleteStudent(this);' class ='btn btn-default' " +
+                     "data-id ='" + student.Id + "'> " +
+                     "<span class='glyphicon glyphicon-remove' />  </button>" +
+                     "</td>" +
+                     "</tr>"
+
+                  );
+            };
+
+            function fillStudent(row) {
+                var id = $(row).data("id");
+                $.ajax({
+                    url: "/api/Students/" + id,
+                    type: 'GET',
+                    contentType: 'application/json',
+                    success: function (student) {
+                        $("#UpdateStudentId").val(student.Id);
+                        $("#UpdateStudentName").val(student.Name);
+                        $("#UpdateLopId").val(student.LopId);
+                    },
+                    error: function (request, message, error) {
+                        handleException(request, message, error);
+                    }
+                });
+
+
+
+            };
+
+            function deleteStudent(row) {
+                var id = $(row).data("id");
+
+                $.ajax({
+                    url: "/api/Students/" + id,
+                    type: 'DELETE',
+                    success: function (student) {
+                        $(row).parents("tr").remove();
+                    },
+                    error: function (request, message, error) {
+                        handleException(request, message, error);
+                    }
+                });
+
+            };
+
+            function updateStudent() {
+
+                var student = {
+                    Id:"",
+                    Name: "",
+                    LopId: "",
+                };
+
+                student.Id = $("#UpdateStudentId").val();
+                student.Name = $("#UpdateStudentName").val();
+                student.LopId = $("#UpdateLopId").val();
+
+                $.ajax({
+                    url: "/api/Students/" + student.Id,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(student),
+                    success: function (data) {
+                        getStudent();
+                    },
+                    error: function (request, message, error) {
+                        handleException(request, message, error);
+                    }
+
+                });
+
+            }
+
+
+            function addStudent() {
+                var student = {
+                    Name: "",
+                    LopId: "",
+                };
+
+                student.Name = $("#AddStudentName").val();
+                student.LopId = $("#AddLopId").val();
+                $.ajax({
+                    url: '/api/Students',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(student),
+                    success: function (data) {
+                        getStudent();
+                    },
+                    error: function (request, message, error) {
+                        handleException(request, message, error);
+                    }
+
+                });
+            };
+
+            function handleException(request, message, error) {
+                var msg = "";
+                msg += "Code: " + request.status + "\n";
+                msg += "Text: " + request.statusText + "\n";
+                if (request.responseJSON != null) {
+                    msg += "Message" +
+                        request.responseJSON.Message + "\n";
+                }
+                alert(msg);
+            }
+
+
+    </script>
+    
+</head>
+<body>
+    <div class="row">
+        <div class="col-lg-6">
+            <table id="StudentTable" class="table table-bordered table-condensed table-condensed">
+                <thead>
+                    <tr>
+                        <th>Edit</th>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Class Id</th>
+                        <th>Delete</th>
+                    </tr>
+
+                </thead>
+
+                <tbody></tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <hr />
+
+    <h1> Add Student</h1>
+    <div class="form-group">
+      
+        <label for="StudentName">Name Student</label>
+        <input type="text" id="AddStudentName" class="form-control" />
+        <label for="LopId">Lop Id</label>
+        <input type="text" id="AddLopId" class="form-control" />
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <button type="button" id="addStudent" class="btn btn-primary"
+                    onclick='addStudent();'>
+                Add Student
+            </button>
+
+        </div>
+    </div>
+
+
+    </hr>
+
+    <h1> Update Student</h1>
+    <div class="form-group">
+        <label for="StudentName">Id Student</label>
+        <input type="text" id="UpdateStudentId" class="form-control" disabled />
+
+        <label for="StudentName">Name Student</label>
+        <input type="text" id="UpdateStudentName" class="form-control" />
+        <label for="LopId">Lop Id</label>
+        <input type="text" id="UpdateLopId" class="form-control" />
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <button type="button" id="UpdateStudent" class="btn btn-primary"
+                    onclick='updateStudent();'>
+                Update Student
+            </button>
+
+        </div>
+    </div>
+
+ 
+
+
+        
+    
+</body>
+</html>
